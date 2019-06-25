@@ -1,22 +1,20 @@
 #! /usr/bin/python
 #-*- coding:UTF-8 -*-
 
-from scipy import misc
 import tensorflow as tf
 import detect_face
 import cv2
 import matplotlib.pyplot as plt
 import os
-import imageio
 
 minsize = 20 # minimum size of face
 threshold = [ 0.6, 0.7, 0.7 ] # three steps's threshold
 factor = 0.709 # scale factor
 gpu_memory_fraction=1.0
 
-root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-imgsrc = os.path.join(root_path, "imgsrc/IMG4922.JPG")
-imgbuild = os.path.join(root_path, "imgbuild/IMG4922_build.JPG")
+base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+imgsrc_dir = os.path.join(base_path, "imgsrc/IMG4922.JPG")
+
 print('Creating networks and loading parameters')
 
 with tf.Graph().as_default():
@@ -27,8 +25,8 @@ with tf.Graph().as_default():
 
 
 
-img = imageio.imread(imgsrc)
-b, g, r = cv2.split(img)
+img = cv2.imread(imgsrc_dir)# cv2rbg格式与其他组件不同
+img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 bounding_boxes, _ = detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
 nrof_faces = bounding_boxes.shape[0]#人脸数目
 print('找到人脸数目为：{}'.format(nrof_faces))
